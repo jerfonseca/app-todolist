@@ -1,0 +1,144 @@
+<div class="todo-page-shell py-4">
+  <div class="todo-page-content">
+      <!-- Header Section -->
+      <mat-card class="header-card mb-4" elevation="2">
+        <mat-card-content class="p-4">
+          <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-4">
+            <div class="header-content">
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <mat-icon class="header-icon">checklist</mat-icon>
+                <h1 class="header-title m-0">Mis Tareas</h1>
+              </div>
+              <p class="header-subtitle text-muted mb-0">
+                Organiza tu día con tareas bien estructuradas.
+              </p>
+              <div class="stats-info mt-3" *ngIf="(pagination$ | async) as pagination">
+                <div class="stats-badges d-flex flex-wrap gap-2">
+                  <span class="stat-badge d-inline-flex align-items-center">
+                    <mat-icon>assignment</mat-icon>
+                    <span class="ms-1">{{ pagination.total }} tareas</span>
+                  </span>
+                  <span class="stat-badge d-inline-flex align-items-center">
+                    <mat-icon>check_circle</mat-icon>
+                    <span class="ms-1">{{ pagination.completedTotal }} completadas</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="header-actions d-flex gap-4 flex-wrap mt-2">
+              <button mat-flat-button
+                      color="primary"
+                      (click)="onAddTodo()"
+                      [disabled]="(isLoading$ | async)"
+                      class="add-btn">
+                <mat-icon>add</mat-icon>
+                <span class="d-none d-sm-inline ms-2">Nueva Tarea</span>
+              </button>
+              <button mat-stroked-button
+                      color="warn"
+                      (click)="onLogout()"
+                      class="logout-btn">
+                <mat-icon>logout</mat-icon>
+                <span class="d-none d-sm-inline ms-2">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Loading State -->
+      <div *ngIf="(isLoading$ | async)" class="loading-container text-center py-5">
+        <mat-card class="loading-card" elevation="1">
+          <mat-card-content class="p-4">
+            <mat-progress-spinner mode="indeterminate" diameter="60" class="mb-3"></mat-progress-spinner>
+            <h4 class="mb-2">Cargando tus tareas...</h4>
+            <p class="text-muted mb-0">Estamos sincronizando tus datos</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!(isLoading$ | async) && ((todos$ | async) || []).length === 0" class="empty-state-container">
+        <mat-card class="empty-state-card" elevation="1">
+          <mat-card-content class="text-center p-5">
+            <mat-icon class="empty-icon mb-4">assignment_turned_in</mat-icon>
+            <h3 class="empty-title mb-3">¡Bienvenido a tu lista de tareas!</h3>
+            <p class="empty-description text-muted mb-4">
+              Aún no tienes tareas pendientes. Comienza creando tu primera tarea para organizar tu día.
+            </p>
+            <button mat-flat-button
+                    color="primary"
+                    (click)="onAddTodo()"
+                    class="empty-action-btn">
+              <mat-icon>add</mat-icon>
+              <span class="ms-2">Crear Primera Tarea</span>
+            </button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+    <!-- Todo List -->
+    <div class="todo-list-container" *ngIf="!(isLoading$ | async) && ((todos$ | async) || []).length > 0">
+        <div class="list-header mb-3">
+          <h4 class="section-title m-0">
+            <mat-icon class="me-2">list</mat-icon>
+            Tus Tareas ({{ (pagination$ | async)?.total || 0 }})
+          </h4>
+        </div>
+
+        <div class="todo-grid">
+          <app-todo-item
+            *ngFor="let todo of (todos$ | async); trackBy: trackById"
+            [todo]="todo"
+            (toggleComplete)="onToggleComplete($event)"
+            (edit)="onEditTodo($event)"
+            (delete)="onDeleteTodo($event)"
+            class="todo-item">
+          </app-todo-item>
+        </div>
+
+        <div class="pagination-bar mt-4" *ngIf="(pagination$ | async) as pagination">
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="onPageChange(pagination.page - 1, pagination.totalPages)"
+            [disabled]="pagination.page <= 1 || (isLoading$ | async)">
+            Anterior
+          </button>
+
+          <button
+            mat-stroked-button
+            type="button"
+            *ngFor="let page of getVisiblePages(pagination.page, pagination.totalPages)"
+            (click)="onPageChange(page, pagination.totalPages)"
+            [disabled]="page === pagination.page || (isLoading$ | async)"
+            [class.active-page]="page === pagination.page">
+            {{ page }}
+          </button>
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="onPageChange(pagination.page + 1, pagination.totalPages)"
+            [disabled]="pagination.page >= pagination.totalPages || (isLoading$ | async)">
+            Siguiente
+          </button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Form Overlay -->
+  <div *ngIf="showForm" class="form-overlay">
+    <div class="form-modal">
+      <div class="form-container">
+        <app-todo-form
+          [todo]="editingTodo"
+          [isLoading]="(isLoading$ | async) ?? false"
+          (save)="onSaveTodo($event)"
+          (cancel)="onCancelForm()">
+        </app-todo-form>
+      </div>
+    </div>
+  </div>
+</div>

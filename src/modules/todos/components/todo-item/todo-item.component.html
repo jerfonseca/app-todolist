@@ -1,0 +1,64 @@
+<mat-card
+  class="todo-item-card mb-3"
+  [class.completed]="todo.completed"
+  role="article"
+  [attr.aria-labelledby]="titleId"
+  [attr.aria-describedby]="articleDescriptionId">
+  <mat-card-content class="p-3">
+    <div class="d-flex align-items-start gap-3">
+      <mat-checkbox
+        [checked]="todo.completed"
+        (change)="onToggleComplete()"
+        class="todo-checkbox mt-1"
+        [attr.aria-label]="toggleCompleteAriaLabel"
+        [attr.aria-describedby]="titleId">
+      </mat-checkbox>
+
+      <div class="todo-content flex-grow-1">
+        <div class="todo-header">
+          <h3 class="todo-title m-0" [class.completed-text]="todo.completed" [id]="titleId">
+            {{ todo.title }}
+          </h3>
+          <div class="todo-meta">
+            <small class="todo-date text-muted" [id]="dateId">
+              <mat-icon class="todo-date-icon" aria-hidden="true">schedule</mat-icon>
+              {{ todo.createdAt | date:'dd/MM/yyyy HH:mm' }}
+            </small>
+          </div>
+        </div>
+
+        <p
+          *ngIf="todo.description"
+          class="todo-description mb-2"
+          [id]="descriptionId"
+          [class.completed-text]="todo.completed"
+          [class.description-collapsed]="!isDescriptionExpanded && canToggleDescription()">
+          {{ todo.description }}
+        </p>
+
+        <button
+          *ngIf="canToggleDescription()"
+          mat-button
+          type="button"
+          class="show-more-btn mb-3"
+          (click)="onToggleDescription()"
+          [attr.aria-expanded]="isDescriptionExpanded"
+          [attr.aria-controls]="descriptionId"
+          [attr.aria-label]="toggleDescriptionAriaLabel">
+          {{ isDescriptionExpanded ? 'Ver menos' : 'Ver mas' }}
+        </button>
+
+        <div class="todo-actions d-flex gap-2 flex-wrap">
+          <button mat-stroked-button color="primary" size="small" (click)="onEdit()" class="action-btn" [attr.aria-label]="editAriaLabel">
+            <mat-icon aria-hidden="true">edit</mat-icon>
+            <span class="d-none d-sm-inline ms-1">Editar</span>
+          </button>
+          <button mat-stroked-button color="warn" size="small" (click)="onDelete()" class="action-btn" [attr.aria-label]="deleteAriaLabel">
+            <mat-icon aria-hidden="true">delete</mat-icon>
+            <span class="d-none d-sm-inline ms-1">Eliminar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

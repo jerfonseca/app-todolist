@@ -1,0 +1,64 @@
+<form [formGroup]="todoForm" (ngSubmit)="onSubmit()" class="todo-form">
+  <div class="form-container">
+    <div class="form-header mb-4">
+      <mat-icon class="form-icon">assignment</mat-icon>
+      <h3 class="form-title m-0">{{ todo ? 'Editar Tarea' : 'Nueva Tarea' }}</h3>
+      <p class="form-subtitle text-muted mb-0">{{ todo ? 'Modifica los detalles de tu tarea' : 'Crea una nueva tarea para organizar tu día' }}</p>
+    </div>
+
+    <div class="form-fields">
+      <div class="field-block w-100 d-block">
+        <mat-form-field appearance="outline" class="w-100 mb-3" floatLabel="always">
+          <mat-label>Título de la tarea</mat-label>
+          <input matInput
+                 id="title"
+                 type="text"
+                 formControlName="title"
+                 placeholder="Ej: Comprar víveres, Reunión con cliente..."
+                 autocomplete="off" />
+          <mat-icon matPrefix class="me-2">title</mat-icon>
+          <mat-hint>Ingresa un título descriptivo para tu tarea</mat-hint>
+          <mat-error *ngIf="todoForm.get('title')?.invalid && todoForm.get('title')?.touched">
+            <mat-icon class="error-icon">error</mat-icon>
+            El título es requerido y debe tener al menos 3 caracteres.
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="field-block w-100 d-block">
+        <mat-form-field appearance="outline" class="w-100 mb-4" floatLabel="always">
+          <mat-label>Descripción (opcional)</mat-label>
+          <textarea matInput
+                    id="description"
+                    formControlName="description"
+                    placeholder="Agrega detalles adicionales sobre la tarea..."
+                    rows="4"
+                    autocomplete="off"></textarea>
+          <mat-icon matPrefix class="me-2">description</mat-icon>
+          <mat-hint>Proporciona más contexto o instrucciones para completar la tarea</mat-hint>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-actions d-flex gap-3 flex-column flex-sm-row justify-content-end">
+      <button mat-stroked-button
+              color="accent"
+              type="button"
+              (click)="onCancel()"
+              [disabled]="isLoading"
+              class="action-btn cancel-btn">
+        <mat-icon>close</mat-icon>
+        <span>Cancelar</span>
+      </button>
+      <button mat-flat-button
+              color="primary"
+              type="submit"
+              [disabled]="todoForm.invalid || isLoading"
+              class="action-btn submit-btn">
+        <mat-icon *ngIf="!isLoading">{{ todo ? 'save' : 'add' }}</mat-icon>
+        <mat-spinner *ngIf="isLoading" diameter="20" class="me-2"></mat-spinner>
+        <span>{{ isLoading ? 'Guardando...' : (todo ? 'Actualizar Tarea' : 'Crear Tarea') }}</span>
+      </button>
+    </div>
+  </div>
+</form>
