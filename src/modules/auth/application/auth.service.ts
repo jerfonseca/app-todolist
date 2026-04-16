@@ -64,10 +64,8 @@ export class AuthService {
         try {
             const response = await this.http.post<{ user: User; token: string }>(`${environment.apiBaseUrl}/users/register`, credentials).toPromise();
             if (response) {
-                this.authRepository.saveUser(response.user);
-                this.authRepository.saveToken(response.token);
-                this.currentUser.set(response.user);
-                this.router.navigate(["/todos"]);
+                this.clearSessionState();
+                this.router.navigate(["/login"]);
             }
 
             return null;
